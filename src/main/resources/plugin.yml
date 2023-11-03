@@ -1,0 +1,11 @@
+name: PatronManager
+version: '${version}'
+main: net.zithium.patronmanager.PatronManager
+api-version: '1.20'
+
+depend:
+  - LuckPerms
+
+commands:
+  patron:
+    description: 'Main command'

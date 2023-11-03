@@ -1,0 +1,29 @@
+# Patron Manager
+# By ItzSave
+#
+# Permissions:
+# patron.command.add
+# patron.command.set
+mysql_settings:
+  host: "localhost"
+  port: 3306 # Default port for MySQL is 3306.
+  username: "root"
+  password: ""
+  database: "patrons"
+
+# Valid actions are: [MESSAGE], [BROADCAST], [CONSOLE], [SOUND], [COMMAND]
+patron_goals:
+  '1':
+    goal: 1000.0
+    commands:
+      - '[COMMAND] eco give {player} 1000'
+  '2':
+    goal: 5000.0
+    commands:
+      - '[COMMAND] eco give {player} 1000'
+
+messages:
+  balance_command: '&aYour patron balance is: &f${balance} &7[{percentage}%]'
+  balance_added: '&aYou have added {balance} to {target}.'
+  no_permission: '&cYou do not have permission to use this command.'
+  balance_reset: '&aYou have reset {target} balance.'
