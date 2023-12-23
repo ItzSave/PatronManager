@@ -17,7 +17,7 @@ public class PlayerData {
 
     public PlayerData(UUID uuid, double balance) {
         this.uuid = uuid;
-        this.balance = 0.0;
+        this.balance = balance;
         this.goals = parseGoals();
         this.completedGoals = new HashSet<>();
     }
