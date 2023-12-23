@@ -1,3 +1,5 @@
+package net.zithium.patronmanager.managers;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashMap;

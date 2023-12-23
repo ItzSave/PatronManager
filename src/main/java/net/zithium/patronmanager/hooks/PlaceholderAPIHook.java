@@ -13,7 +13,7 @@ import java.util.Optional;
 public class PlaceholderAPIHook extends PlaceholderExpansion {
 
     private final PatronManager plugin;
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
     public PlaceholderAPIHook(PatronManager plugin) {
         this.plugin = plugin;
