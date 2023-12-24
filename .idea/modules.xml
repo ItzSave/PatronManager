@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.PatronManager.main.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.PatronManager.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/PatronManager.main.iml" filepath="$PROJECT_DIR$/.idea/modules/PatronManager.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/PatronManager.test.iml" filepath="$PROJECT_DIR$/.idea/modules/PatronManager.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.zithium.PatronManager.main.iml" filepath="$PROJECT_DIR$/.idea/modules/net.zithium.PatronManager.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/net.zithium.PatronManager.test.iml" filepath="$PROJECT_DIR$/.idea/modules/net.zithium.PatronManager.test.iml" />
     </modules>
   </component>
 </project>

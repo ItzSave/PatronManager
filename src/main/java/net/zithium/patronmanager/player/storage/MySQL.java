@@ -94,25 +94,26 @@ public class MySQL implements StorageHandler {
 
     public void savePlayer(final PlayerData player) {
         try (Connection connection = hikari.getConnection()) {
-            String insertQuery = "INSERT INTO players (uuid, balance) VALUES (?, ?) ON DUPLICATE KEY UPDATE balance = ?";
+            String updateQuery = "UPDATE players SET balance = ? WHERE uuid = ?";
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-                preparedStatement.setString(1, player.getUuid().toString());
-                preparedStatement.setDouble(2, player.getBalance());
-                preparedStatement.setDouble(3, player.getBalance());
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                preparedStatement.setDouble(1, player.getBalance());
+                preparedStatement.setString(2, player.getUuid().toString());
 
                 int rowsAffected = preparedStatement.executeUpdate();
 
                 if (rowsAffected > 0) {
-                    getLogger().info("Player data saved successfully.");
+                    getLogger().info("Player data updated successfully. Rows affected: " + rowsAffected);
                 } else {
-                    getLogger().info("Player data not saved.");
+                    getLogger().warning("No player data found for UUID: " + player.getUuid() + ". No update performed.");
                 }
             }
         } catch (SQLException e) {
-            getLogger().log(Level.SEVERE, "Error saving player data", e);
+            getLogger().log(Level.SEVERE, "Error updating player data", e);
         }
     }
+
+
 
     public Set<Integer> loadCompletedGoals(UUID uuid) {
         Set<Integer> completedGoals = new HashSet<>();
