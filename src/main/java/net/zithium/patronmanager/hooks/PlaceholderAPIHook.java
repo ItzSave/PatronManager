@@ -50,7 +50,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
 
         double balance = playerData.getBalance();
 
-        DecimalFormat decimalFormat = new DecimalFormat("#.33");
+        DecimalFormat decimalFormat = new DecimalFormat("#,###.##");
 
         // %patron_balance%
         if (params.equals("balance")) {

@@ -34,7 +34,7 @@ public class PatronCommand extends CommandBase {
             double currentBalance = playerData.getBalance();
             double targetAmount = playerData.getPercentage(plugin.getConfig().getDouble("settings.patron_price"));
 
-            DecimalFormat decimalFormat = new DecimalFormat("#.33");
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
             String formattedBalance = decimalFormat.format(currentBalance);
             String formattedPercentage = decimalFormat.format(targetAmount);
