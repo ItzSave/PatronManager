@@ -138,7 +138,7 @@ public class PlayerManager {
         });
     }
 
-    private void savePlayerStorage(UUID uuid, boolean clearCache) {
+    public void savePlayerStorage(UUID uuid, boolean clearCache) {
         PlayerData playerData = players.get(uuid);
         if (playerData == null) return;
 
