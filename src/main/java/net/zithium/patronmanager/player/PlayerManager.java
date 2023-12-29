@@ -22,6 +22,8 @@ public class PlayerManager {
 
     private final Map<UUID, PlayerData> players;
 
+    public Set<Integer> completedGoals;
+
     public PlayerManager(PatronManager plugin) {
         this.plugin = plugin;
         this.players = new ConcurrentHashMap<>();
@@ -46,12 +48,23 @@ public class PlayerManager {
                         if (!players.containsKey(uuid)) {
                             // Load player data asynchronously
                             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                                PlayerData playerData = storageHandler.getPlayer(uuid);
-                                if (playerData != null) {
-                                    players.put(uuid, playerData);
-                                    plugin.getLogger().info("Loaded player data for: " + uuid);
-                                } else {
-                                    plugin.getLogger().warning("No player data found for: " + uuid);
+                                try {
+                                    PlayerData playerData = storageHandler.getPlayer(uuid);
+                                    if (playerData != null) {
+                                        players.put(uuid, playerData);
+                                    }
+
+                                    try {
+                                        completedGoals = storageHandler.loadCompletedGoals(uuid);
+                                    } catch (Exception e) {
+                                        plugin.getLogger().log(Level.SEVERE, "Error loading completed goals for: " + uuid, e);
+                                    }
+
+                                    if (!completedGoals.isEmpty() && playerData != null) {
+                                        playerData.setCompletedGoals(playerData, completedGoals);
+                                    }
+                                } catch (Exception e) {
+                                    plugin.getLogger().log(Level.SEVERE, "Error loading player data for: " + uuid, e);
                                 }
                             });
                         }
@@ -108,13 +121,14 @@ public class PlayerManager {
                 PlayerData playerData = storageHandler.getPlayer(uuid);
                 if (playerData != null) {
                     players.put(uuid, playerData);
-                    plugin.getLogger().info("Loaded player data for: " + uuid);
-                } else {
-                    plugin.getLogger().warning("No player data found for: " + uuid);
                 }
 
-                // Load completed goals from MySQL
-                Set<Integer> completedGoals = storageHandler.loadCompletedGoals(uuid);
+                try {
+                    completedGoals = storageHandler.loadCompletedGoals(uuid);
+                } catch (Exception e) {
+                    plugin.getLogger().log(Level.SEVERE, "Error loading completed goals for: " + uuid, e);
+                }
+
                 if (!completedGoals.isEmpty() && playerData != null) {
                     playerData.setCompletedGoals(playerData, completedGoals);
                 }
@@ -124,7 +138,7 @@ public class PlayerManager {
         });
     }
 
-    private void savePlayerStorage(UUID uuid, boolean clearCache) {
+    public void savePlayerStorage(UUID uuid, boolean clearCache) {
         PlayerData playerData = players.get(uuid);
         if (playerData == null) return;
 

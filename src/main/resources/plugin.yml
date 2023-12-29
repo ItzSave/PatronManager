@@ -7,5 +7,7 @@ depend:
   - LuckPerms
 
 commands:
-  patron:
+  patronadmin:
     description: 'Main command'
+    usage: /<command>
+    permission: patron.admin

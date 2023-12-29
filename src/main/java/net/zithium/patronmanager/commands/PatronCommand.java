@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.UUID;
 
-@Command("patron")
+@Command("patronadmin")
 @SuppressWarnings("unused")
 public class PatronCommand extends CommandBase {
 
@@ -27,6 +27,7 @@ public class PatronCommand extends CommandBase {
 
 
     @Default
+    @Permission("patron.admin")
     public void patronCommand(Player player) {
         java.util.Optional<PlayerData> playerDataOptional = playerManager.getPlayerData(player.getUniqueId());
         if (playerDataOptional.isPresent()) {
@@ -34,7 +35,7 @@ public class PatronCommand extends CommandBase {
             double currentBalance = playerData.getBalance();
             double targetAmount = playerData.getPercentage(plugin.getConfig().getDouble("settings.patron_price"));
 
-            DecimalFormat decimalFormat = new DecimalFormat("#.33");
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
             String formattedBalance = decimalFormat.format(currentBalance);
             String formattedPercentage = decimalFormat.format(targetAmount);
@@ -48,7 +49,7 @@ public class PatronCommand extends CommandBase {
 
 
     @SubCommand("add")
-    @Permission("patron.command.add")
+    @Permission("patronadmin.command.add")
     public void addCommand(CommandSender sender, @Completion("#players") Player player, String amount) {
         if (!verifyArgs(sender, player, amount)) return;
 
@@ -70,7 +71,7 @@ public class PatronCommand extends CommandBase {
     }
 
     @SubCommand("set")
-    @Permission("patron.command.set")
+    @Permission("patronadmin.command.set")
     public void setCommand(CommandSender sender, @Completion("#players") Player player, String amount) {
         if (!verifyArgs(sender, player, amount)) return;
 
@@ -93,7 +94,7 @@ public class PatronCommand extends CommandBase {
     }
 
     @SubCommand("reset")
-    @Permission("patron.command.reset")
+    @Permission("patronadmin.command.reset")
     public void resetCommand(CommandSender sender, @Completion("#players") Player player) {
         java.util.Optional<PlayerData> playerDataOptional = playerManager.getPlayerData(player.getUniqueId());
         if (playerDataOptional.isPresent()) {
@@ -118,6 +119,8 @@ public class PatronCommand extends CommandBase {
         players.put(uuid, playerData);
         // Logging data creation just incase.
         plugin.getLogger().info("Player data created for UUID: " + uuid + " with balance: " + balance);
+        //save player data to database otherwise it will be lost on restart or relog
+        playerManager.savePlayerStorage(uuid, false);
     }
 
     private boolean verifyArgs(CommandSender sender, Player player, String amountStr) {

@@ -16,11 +16,23 @@ patron_goals:
   '1':
     goal: 1000.0
     commands:
-      - '[COMMAND] eco give {player} 1000'
+      - '[CONSOLE] eco give {player} 1000'
   '2':
+    goal: 2000.0
+    commands:
+      - '[CONSOLE] eco give {player} 2000'
+  '3':
+    goal: 3000.0
+    commands:
+      - '[CONSOLE] eco give {player} 2000'
+  '4':
+    goal: 4000.0
+    commands:
+      - '[CONSOLE] eco give {player} 2000'
+  '5':
     goal: 5000.0
     commands:
-      - '[COMMAND] eco give {player} 1000'
+      - '[CONSOLE] eco give {player} 5000'
 
 messages:
   balance_command: '&aYour patron balance is: &f${balance} &7[{percentage}%]'

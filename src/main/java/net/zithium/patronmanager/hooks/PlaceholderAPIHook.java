@@ -45,12 +45,12 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         if (offlinePlayer == null) return "";
 
         final Optional<PlayerData> playerDataOptional = playerManager.getPlayerData(offlinePlayer.getUniqueId());
-        if (playerDataOptional.isEmpty()) return "[player-data null]";
+        if (playerDataOptional.isEmpty()) return "0";
         PlayerData playerData = playerDataOptional.get();
 
         double balance = playerData.getBalance();
 
-        DecimalFormat decimalFormat = new DecimalFormat("#.33");
+        DecimalFormat decimalFormat = new DecimalFormat("#,###.##");
 
         // %patron_balance%
         if (params.equals("balance")) {

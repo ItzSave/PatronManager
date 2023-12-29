@@ -102,14 +102,24 @@ public class MySQL implements StorageHandler {
 
                 int rowsAffected = preparedStatement.executeUpdate();
 
-                if (rowsAffected > 0) {
-                    getLogger().info("Player data updated successfully. Rows affected: " + rowsAffected);
+                if (rowsAffected == 0) {
+                    // No rows affected, so the player data does not exist
+                    // Insert the new player data
+                    String insertQuery = "INSERT INTO players (uuid, balance) VALUES (?, ?)";
+
+                    try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                        insertStatement.setString(1, player.getUuid().toString());
+                        insertStatement.setDouble(2, player.getBalance());
+
+                        insertStatement.executeUpdate();
+                        getLogger().info("Player data inserted successfully.");
+                    }
                 } else {
-                    getLogger().warning("No player data found for UUID: " + player.getUuid() + ". No update performed.");
+                    getLogger().info("Player data updated successfully. Rows affected: " + rowsAffected);
                 }
             }
         } catch (SQLException e) {
-            getLogger().log(Level.SEVERE, "Error updating player data", e);
+            getLogger().log(Level.SEVERE, "Error saving player data", e);
         }
     }
 
@@ -132,7 +142,7 @@ public class MySQL implements StorageHandler {
                 }
             }
         } catch (SQLException e) {
-            // Handle the exception
+            getLogger().log(Level.SEVERE, "Error loading completed goals for UUID: " + uuid, e);
         }
 
         return completedGoals;
@@ -140,20 +150,21 @@ public class MySQL implements StorageHandler {
 
     public void saveCompletedGoals(UUID uuid, Set<Integer> completedGoals) {
         try (Connection connection = hikari.getConnection()) {
-            String insertQuery = "INSERT INTO player_completed_goals (player_uuid, goal_number) VALUES (?, ?)";
+            String insertQuery = "INSERT INTO player_completed_goals (player_uuid, goal_number) VALUES (?, ?) ON DUPLICATE KEY UPDATE goal_number = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
                 for (int goalNumber : completedGoals) {
                     preparedStatement.setString(1, uuid.toString());
                     preparedStatement.setInt(2, goalNumber);
+                    preparedStatement.setInt(3, goalNumber); // Update the goal_number if the record already exists
                     preparedStatement.addBatch();
                 }
 
-                // Execute the batch insert
+                // Execute the batch insert/update
                 preparedStatement.executeBatch();
             }
         } catch (SQLException e) {
-            // Handle the exception
+            getLogger().log(Level.SEVERE, "Error saving completed goals", e);
         }
     }
 

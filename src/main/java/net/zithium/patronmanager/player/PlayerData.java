@@ -17,7 +17,7 @@ public class PlayerData {
 
     public PlayerData(UUID uuid, double balance) {
         this.uuid = uuid;
-        this.balance = 0.0;
+        this.balance = balance;
         this.goals = parseGoals();
         this.completedGoals = new HashSet<>();
     }
@@ -63,15 +63,24 @@ public class PlayerData {
             int goalNumber = goalEntry.getKey();
             double goalAmount = goalEntry.getValue();
 
-            if (balance >= goalAmount) {
-                // Player has reached this goal, perform associated commands.
+            if (balance >= goalAmount && !completedGoals.contains(goalNumber)) {
+                // Player has reached this goal, and it hasn't been completed yet
                 performGoalCommands(goalNumber, player);
+                completedGoals.add(goalNumber);
+            } else {
+                // Log if the goal has already been completed
+                if (completedGoals.contains(goalNumber)) {
+                }
             }
         }
     }
 
+
     private Map<Integer, Double> parseGoals() {
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("patron_goals");
+        if (section == null) {
+            plugin.getLogger().warning("No 'patron_goals' section found in the configuration.");
+        }
         Map<Integer, Double> goalMap = new HashMap<>();
         if (section != null) {
             for (String goalKey : section.getKeys(false)) {
@@ -84,7 +93,14 @@ public class PlayerData {
     }
 
     private void performGoalCommands(int goalNumber, Player player) {
+        if (completedGoals.contains(goalNumber)) {
+            plugin.getLogger().info("Goal number: " + goalNumber + " is already completed.");
+            return;
+        }
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("patron_goals." + goalNumber);
+        if (section == null) {
+            plugin.getLogger().warning("No configuration section found for goal number: " + goalNumber);
+        }
         if (section != null) {
             List<String> commands = section.getStringList("commands");
             double goalAmount = section.getDouble("goal", 0.0);
@@ -92,15 +108,12 @@ public class PlayerData {
             if (balance >= goalAmount) {
                 // Player has reached this goal, perform associated commands.
                 for (String command : commands) {
-                    String replacedCommand = command.replace("{PLAYER}", player.getName());
+                    String replacedCommand = command.replace("{player}", player.getName());
                     List<String> commandList = new ArrayList<>();
                     commandList.add(replacedCommand);
                     plugin.getActionManager().executeActions(player, commandList);
                 }
 
-                // After successfully executing the commands, you may want to mark this goal as completed
-                // to prevent it from being executed again in the future. You can use a boolean flag or
-                // a database entry for this purpose.
                 completedGoals.add(goalNumber);
             }
         }
@@ -111,7 +124,14 @@ public class PlayerData {
     }
 
     public void setCompletedGoals(PlayerData playerData, Set<Integer> completedGoals) {
+        plugin.getLogger().info("Attempting to set completed goals.");
+        if (completedGoals.isEmpty()) {
+            plugin.getLogger().info("No completed goals to set.");
+        } else {
+            plugin.getLogger().info("Found completed goals to set.");
+        }
         this.completedGoals.clear();
+        this.completedGoals.addAll(playerData.getCompletedGoals());
         this.completedGoals.addAll(completedGoals);
     }
 
