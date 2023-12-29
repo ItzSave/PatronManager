@@ -27,6 +27,7 @@ public class PatronCommand extends CommandBase {
 
 
     @Default
+    @Permission("patron.admin")
     public void patronCommand(Player player) {
         java.util.Optional<PlayerData> playerDataOptional = playerManager.getPlayerData(player.getUniqueId());
         if (playerDataOptional.isPresent()) {

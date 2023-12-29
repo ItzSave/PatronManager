@@ -102,14 +102,24 @@ public class MySQL implements StorageHandler {
 
                 int rowsAffected = preparedStatement.executeUpdate();
 
-                if (rowsAffected > 0) {
-                    getLogger().info("Player data updated successfully. Rows affected: " + rowsAffected);
+                if (rowsAffected == 0) {
+                    // No rows affected, so the player data does not exist
+                    // Insert the new player data
+                    String insertQuery = "INSERT INTO players (uuid, balance) VALUES (?, ?)";
+
+                    try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                        insertStatement.setString(1, player.getUuid().toString());
+                        insertStatement.setDouble(2, player.getBalance());
+
+                        insertStatement.executeUpdate();
+                        getLogger().info("Player data inserted successfully.");
+                    }
                 } else {
-                    getLogger().warning("No player data found for UUID: " + player.getUuid() + ". No update performed.");
+                    getLogger().info("Player data updated successfully. Rows affected: " + rowsAffected);
                 }
             }
         } catch (SQLException e) {
-            getLogger().log(Level.SEVERE, "Error updating player data", e);
+            getLogger().log(Level.SEVERE, "Error saving player data", e);
         }
     }
 
