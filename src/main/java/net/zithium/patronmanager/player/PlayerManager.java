@@ -47,6 +47,7 @@ public class PlayerManager {
                         // Check if player data is already loaded
                         if (!players.containsKey(uuid)) {
                             // Load player data asynchronously
+                            // Load player data asynchronously
                             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                                 try {
                                     PlayerData playerData = storageHandler.getPlayer(uuid);
@@ -60,7 +61,14 @@ public class PlayerManager {
                                         plugin.getLogger().log(Level.SEVERE, "Error loading completed goals for: " + uuid, e);
                                     }
 
-                                    if (!completedGoals.isEmpty() && playerData != null) {
+                                    if (completedGoals.isEmpty() && playerData != null) {
+                                        // If the player has no completed goals in the database, perform the initial goal commands
+                                        for (Integer goal : playerData.getGoals().keySet()) {
+                                            playerData.performGoalCommands(goal, event.getPlayer());
+                                        }
+                                        // Save the completed goals in the database
+                                        storageHandler.saveCompletedGoals(uuid, playerData.getCompletedGoals());
+                                    } else if (!completedGoals.isEmpty() && playerData != null) {
                                         playerData.setCompletedGoals(playerData, completedGoals);
                                     }
                                 } catch (Exception e) {
@@ -143,11 +151,14 @@ public class PlayerManager {
         if (playerData == null) return;
 
         // Use async scheduler to save player data in a separate thread
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             storageHandler.savePlayer(playerData);
             // Save completed goals in MySQL
-            storageHandler.saveCompletedGoals(playerData.getUuid(), playerData.getCompletedGoals());
-
+            Set<Integer> oldCompletedGoals = storageHandler.loadCompletedGoals(uuid);
+            if (!playerData.getCompletedGoals().equals(oldCompletedGoals)) {
+                storageHandler.saveCompletedGoals(playerData.getUuid(), playerData.getCompletedGoals());
+            }
             if (clearCache) {
                 players.remove(uuid);
             }

@@ -1,6 +1,7 @@
 package net.zithium.patronmanager.player;
 
 import net.zithium.patronmanager.PatronManager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -48,6 +49,10 @@ public class PlayerData {
         }
     }
 
+    public Map<Integer, Double> getGoals() {
+        return goals;
+    }
+
     public boolean hasReachedGoal(double targetGoal, Player player) {
         return balance >= targetGoal;
     }
@@ -92,7 +97,7 @@ public class PlayerData {
         return goalMap;
     }
 
-    private void performGoalCommands(int goalNumber, Player player) {
+    public void performGoalCommands(int goalNumber, Player player) {
         if (completedGoals.contains(goalNumber)) {
             plugin.getLogger().info("Goal number: " + goalNumber + " is already completed.");
             return;
@@ -111,7 +116,8 @@ public class PlayerData {
                     String replacedCommand = command.replace("{player}", player.getName());
                     List<String> commandList = new ArrayList<>();
                     commandList.add(replacedCommand);
-                    plugin.getActionManager().executeActions(player, commandList);
+                    // Dispatch the command on the main server thread
+                    Bukkit.getScheduler().runTask(plugin, () -> plugin.getActionManager().executeActions(player, commandList));
                 }
 
                 completedGoals.add(goalNumber);

@@ -150,13 +150,12 @@ public class MySQL implements StorageHandler {
 
     public void saveCompletedGoals(UUID uuid, Set<Integer> completedGoals) {
         try (Connection connection = hikari.getConnection()) {
-            String insertQuery = "INSERT INTO player_completed_goals (player_uuid, goal_number) VALUES (?, ?) ON DUPLICATE KEY UPDATE goal_number = ?";
+            String insertQuery = "INSERT INTO player_completed_goals (player_uuid, goal_number) VALUES (?, ?) ON DUPLICATE KEY UPDATE goal_number = VALUES(goal_number)";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
                 for (int goalNumber : completedGoals) {
                     preparedStatement.setString(1, uuid.toString());
                     preparedStatement.setInt(2, goalNumber);
-                    preparedStatement.setInt(3, goalNumber); // Update the goal_number if the record already exists
                     preparedStatement.addBatch();
                 }
 
@@ -167,6 +166,4 @@ public class MySQL implements StorageHandler {
             getLogger().log(Level.SEVERE, "Error saving completed goals", e);
         }
     }
-
-
 }
